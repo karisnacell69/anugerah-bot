@@ -2,12 +2,15 @@ import requests
 import uuid
 import os
 from PIL import Image, ImageDraw, ImageFont
-from telegram import (
-    Update, InlineKeyboardButton, InlineKeyboardMarkup
-)
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
-    ApplicationBuilder, CommandHandler, CallbackQueryHandler,
-    MessageHandler, ContextTypes, filters, ConversationHandler
+    ApplicationBuilder,
+    CommandHandler,
+    CallbackQueryHandler,
+    MessageHandler,
+    ContextTypes,
+    filters,
+    ConversationHandler,
 )
 
 # ================= CONFIG =================
@@ -20,18 +23,14 @@ URL_WEB = "http://localhost:5000/api/order"
 COMBINED_IMG = "combined_payment.jpg"
 
 # ================= HARGA =================
-HARGA = {
-    "17": 70000,
-    "18": 75000,
-    "19": 80000,
-    "20": 85000
-}
+HARGA = {"17": 70000, "18": 75000, "19": 80000, "20": 85000}
 
 # ================= DATABASE SEMENTARA =================
 ORDERS = {}
 
 # ================= STATE =================
 UMUR, JUMLAH, NAMA, ALAMAT = range(4)
+
 
 # ================= BUAT GAMBAR GABUNGAN =================
 def buat_combined_image():
@@ -66,7 +65,7 @@ def buat_combined_image():
         "Anugerah Farm Store  —  Pembayaran QRIS",
         fill="white",
         font=font,
-        anchor="mm"
+        anchor="mm",
     )
 
     logo_x = (WIDTH - logo_size) // 2
@@ -76,21 +75,23 @@ def buat_combined_image():
     canvas.save(COMBINED_IMG, quality=92)
     print(f"✅ Gambar gabungan dibuat: {canvas.size}")
 
+
 # ================= START =================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🐔 17 Minggu — Rp70.000/ekor", callback_data="17")],
         [InlineKeyboardButton("🐔 18 Minggu — Rp75.000/ekor", callback_data="18")],
         [InlineKeyboardButton("🔥 19 Minggu — Rp80.000/ekor", callback_data="19")],
-        [InlineKeyboardButton("🔥 20 Minggu — Rp85.000/ekor", callback_data="20")]
+        [InlineKeyboardButton("🔥 20 Minggu — Rp85.000/ekor", callback_data="20")],
     ]
 
     await update.message.reply_text(
         "🐔 *ANUGERAH FARM STORE*\n\nPilih umur ayam yang ingin dipesan:",
         reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
     return UMUR
+
 
 # ================= PILIH UMUR =================
 async def pilih_umur(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -103,9 +104,10 @@ async def pilih_umur(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.message.reply_text(
         f"✅ Umur: *{umur} minggu* | Harga: *Rp{HARGA[umur]:,}*\n\n📦 Masukkan jumlah ekor:",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
     return JUMLAH
+
 
 # ================= JUMLAH =================
 async def jumlah(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -127,15 +129,17 @@ async def jumlah(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"━━━━━━━━━━━━━━\n"
         f"💵 Total: *Rp{total:,}*\n\n"
         f"📝 Masukkan nama pemesan:",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
     return NAMA
+
 
 # ================= NAMA =================
 async def nama(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["nama"] = update.message.text
     await update.message.reply_text("📍 Masukkan alamat pengiriman:")
     return ALAMAT
+
 
 # ================= ALAMAT + ORDER + KIRIM WEB =================
 async def alamat(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -150,9 +154,9 @@ async def alamat(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "umur": data["umur"],
             "jumlah": data["jumlah"],
             "alamat": data["alamat"],
-            "total": data["total"]
+            "total": data["total"],
         },
-        "status": "PENDING"
+        "status": "PENDING",
     }
 
     # Kirim ke web admin
@@ -165,9 +169,9 @@ async def alamat(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "jumlah": data["jumlah"],
                 "total": data["total"],
                 "umur": data["umur"],
-                "alamat": data["alamat"]
+                "alamat": data["alamat"],
             },
-            timeout=5
+            timeout=5,
         )
         status_web = "✅ Tercatat di admin panel"
     except Exception as e:
@@ -194,17 +198,18 @@ async def alamat(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"{ringkasan}\n\n"
                 f"📸 Scan QR di atas lalu kirim *foto bukti transfer* di sini"
             ),
-            parse_mode="Markdown"
+            parse_mode="Markdown",
         )
 
     # ===== KIRIM KE ADMIN =====
     await context.bot.send_message(
         chat_id=ADMIN_ID,
         text=f"📥 *ORDER BARU MASUK*\n\n{ringkasan}",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
     return ConversationHandler.END
+
 
 # ================= BUKTI TRANSFER =================
 async def bukti_transfer(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -229,8 +234,12 @@ async def bukti_transfer(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [
-            InlineKeyboardButton("✅ Lunas", callback_data=f"approve_{last_order_id}_{user_id}"),
-            InlineKeyboardButton("❌ Tolak", callback_data=f"reject_{last_order_id}_{user_id}")
+            InlineKeyboardButton(
+                "✅ Lunas", callback_data=f"approve_{last_order_id}_{user_id}"
+            ),
+            InlineKeyboardButton(
+                "❌ Tolak", callback_data=f"reject_{last_order_id}_{user_id}"
+            ),
         ]
     ]
 
@@ -238,17 +247,16 @@ async def bukti_transfer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=ADMIN_ID,
         photo=file_id,
         caption=(
-            f"📸 *Bukti Transfer*\n"
-            f"🆔 Order ID: `{last_order_id}`\n"
-            f"👤 Dari: {user_name}"
+            f"📸 *Bukti Transfer*\n🆔 Order ID: `{last_order_id}`\n👤 Dari: {user_name}"
         ),
         reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
     await update.message.reply_text(
         "✅ Bukti transfer terkirim!\nMenunggu konfirmasi admin... 🕐"
     )
+
 
 # ================= APPROVE/REJECT ADMIN =================
 async def handle_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -278,9 +286,7 @@ async def handle_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id:
         try:
             await context.bot.send_message(
-                chat_id=user_id,
-                text=user_msg,
-                parse_mode="Markdown"
+                chat_id=user_id, text=user_msg, parse_mode="Markdown"
             )
         except Exception as e:
             print(f"Gagal kirim ke user: {e}")
@@ -289,15 +295,19 @@ async def handle_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         requests.get(
             f"http://localhost:5000/api/update/{order_id}/{ORDERS[order_id]['status']}",
-            timeout=3
+            timeout=3,
         )
     except Exception:
         pass
 
+
 # ================= CANCEL =================
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("❌ Order dibatalkan. Ketik /start untuk mulai lagi.")
+    await update.message.reply_text(
+        "❌ Order dibatalkan. Ketik /start untuk mulai lagi."
+    )
     return ConversationHandler.END
+
 
 # ================= STATUS =================
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -306,9 +316,9 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     lines = [f"🆔 `{oid}` — {o['status']}" for oid, o in list(ORDERS.items())[-5:]]
     await update.message.reply_text(
-        "📋 *5 Order Terakhir:*\n\n" + "\n".join(lines),
-        parse_mode="Markdown"
+        "📋 *5 Order Terakhir:*\n\n" + "\n".join(lines), parse_mode="Markdown"
     )
+
 
 # ================= MAIN =================
 if __name__ == "__main__":
