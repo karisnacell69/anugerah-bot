@@ -6,7 +6,7 @@ app = Flask(__name__)
 ORDERS = {}
 
 # ================= API TAMBAH ORDER =================
-@app.route("/admin/api/order", methods=["POST"])
+@app.route("/api/order", methods=["POST"])
 def add_order():
     data = request.form.to_dict()
     order_id = data.get("order_id")
@@ -17,20 +17,19 @@ def add_order():
     return jsonify({"status": "ok"})
 
 # ================= API GET SEMUA ORDER =================
-@app.route("/admin/api/orders")
+@app.route("/api/orders")
 def get_orders():
     return jsonify(ORDERS)
 
 # ================= UPDATE STATUS =================
-@app.route("/admin/api/update/<order_id>/<status>")
+@app.route("/api/update/<order_id>/<status>")
 def update_status(order_id, status):
     if order_id in ORDERS:
         ORDERS[order_id]["status"] = status.upper()
     return jsonify({"status": "updated"})
 
 # ================= WEB ADMIN =================
-@app.route("/admin")
-@app.route("/admin/")
+@app.route("/")
 def index():
     return """<!DOCTYPE html>
 <html>
@@ -101,7 +100,7 @@ async function loadOrders() {
             <p>📦 <b>Jumlah:</b> ${o.data.jumlah} ekor</p>
             <p>📍 <b>Alamat:</b> ${o.data.alamat}</p>
             <p>💰 <b>Total:</b> Rp${Number(o.data.total).toLocaleString('id-ID')}</p>
-            <span class="badge ${o.status}">⏳ ${o.status}</span>
+            <span class="badge ${o.status}">${o.status}</span>
             <div class="actions">
                 <button class="ok" onclick="update('${id}','lunas')">✅ Lunas</button>
                 <button class="no" onclick="update('${id}','ditolak')">❌ Tolak</button>

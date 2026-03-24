@@ -12,8 +12,8 @@ from telegram.ext import (
 TOKEN = "8636518862:AAGZDQJMzlxQklGi4DfCXWN7N2WKr4IDMqU"
 ADMIN_ID = 6806611251
 
-# 🔗 WEB KAMU
-URL_WEB = "https://ayametelur909.great-site.net/admin/api/order"
+# 🔗 WEB ADMIN (panel lokal via proxy)
+URL_WEB = "http://localhost:5000/api/order"
 
 # ================= HARGA =================
 HARGA = {
