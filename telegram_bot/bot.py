@@ -81,7 +81,7 @@ async def erreur(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def main() -> None:
-    token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    token = os.environ.get("8636518862:AAGZDQJMzlxQklGi4DfCXWN7N2WKr4IDMqU")
     if not token:
         raise ValueError(
             "TELEGRAM_BOT_TOKEN n'est pas défini. "
