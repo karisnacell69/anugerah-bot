@@ -13,7 +13,7 @@ TOKEN = "8636518862:AAGZDQJMzlxQklGi4DfCXWN7N2WKr4IDMqU"
 ADMIN_ID = 6806611251
 
 # 🔗 WEB KAMU
-URL_WEB = "https://ayametelur909.great-site.net/api/order"
+URL_WEB = "https://ayametelur909.great-site.net/admin/api/order"
 
 # ================= HARGA =================
 HARGA = {
