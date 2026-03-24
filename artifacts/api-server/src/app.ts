@@ -40,4 +40,12 @@ app.use(
   })
 );
 
+app.use(
+  "/webhook",
+  createProxyMiddleware({
+    target: "http://localhost:5000",
+    changeOrigin: true,
+  })
+);
+
 export default app;
